@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecetApp — Mis recetas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f0; min-height: 100vh; }
+
+    /* Header */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 0.6rem; }
+    .header-left .icon { font-size: 1.4rem; }
+    .header-left h1 { font-size: 1.15rem; font-weight: 700; color: #1a1a1a; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .user-name { font-size: 0.875rem; color: #666; }
+    .btn-logout {
+      background: none; border: 1px solid #ddd; border-radius: 8px;
+      padding: 0.45rem 0.9rem; font-size: 0.8rem; color: #666; cursor: pointer;
+    }
+    .btn-logout:hover { background: #f5f5f5; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+
+    /* Barra de acciones */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 0.65rem 0.875rem 0.65rem 2.25rem;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .search-box input:focus { border-color: #e07b39; }
+    .search-box .icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); opacity: 0.4; }
+
+    .btn-nueva {
+      background: #e07b39; color: #fff; border: none; border-radius: 8px;
+      padding: 0.65rem 1.1rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .btn-nueva:hover { background: #c9682a; }
+
+    /* Grid de recetas */
+    .recetas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .receta-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .receta-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .receta-img {
+      width: 100%;
+      height: 150px;
+      background: #f0ece3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      object-fit: cover;
+    }
+    .receta-info { padding: 0.9rem 1rem; }
+    .receta-titulo {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .receta-meta {
+      display: flex;
+      gap: 0.9rem;
+      font-size: 0.78rem;
+      color: #888;
+    }
+    .receta-meta span { display: flex; align-items: center; gap: 0.25rem; }
+
+    .receta-actions {
+      display: flex;
+      border-top: 1px solid #f0f0f0;
+    }
+    .receta-actions button {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.6rem;
+      font-size: 0.8rem;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+    .receta-actions button:hover { background: #f8f8f8; }
+    .receta-actions button.delete:hover { color: #e04040; }
+    .receta-actions .divider { width: 1px; background: #f0f0f0; }
+
+    /* Estado vacío */
+    .estado-vacio {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: #999;
+    }
+    .estado-vacio .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .estado-vacio p { font-size: 0.9rem; margin-bottom: 1rem; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 3rem; color: #999; font-size: 0.875rem; }
+
+    /* Modal confirmar borrado */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    .modal p { font-size: 0.9rem; color: #444; margin-bottom: 1.25rem; }
+    .modal-actions { display: flex; gap: 0.6rem; }
+    .modal-actions button {
+      flex: 1; border: none; border-radius: 8px; padding: 0.6rem; font-size: 0.85rem; cursor: pointer; font-weight: 600;
+    }
+    .modal-actions .cancelar { background: #f0f0f0; color: #444; }
+    .modal-actions .confirmar { background: #e04040; color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="icon">🍽️</span>
+    <h1>RecetApp</h1>
+  </div>
+  <div class="header-right">
+    <span class="user-name" id="nombre-usuario">Usuario</span>
+    <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" id="buscador" placeholder="Buscar en mis recetas..." oninput="filtrarRecetas()">
+    </div>
+    <button class="btn-nueva" onclick="window.location.href='formulario.html'">
+      <span>+</span> Nueva receta
+    </button>
+  </div>
+
+  <div id="contenido">
+    <div class="loading">Cargando recetas...</div>
+  </div>
+</main>
+
+<!-- Modal de confirmación para borrar -->
+<div class="modal-overlay" id="modal-borrar">
+  <div class="modal">
+    <p>¿Seguro que quieres eliminar esta receta? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="cancelar" onclick="cerrarModal()">Cancelar</button>
+      <button class="confirmar" onclick="confirmarBorrar()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIGURACIÓN ──────────────────────────────────────────
+  // Cambia esta URL cuando el backend esté listo (ver index.html)
+  const API = 'http://localhost:8080/api'
+
+  let todasLasRecetas = []
+  let idABorrar = null
+
+  // ── PROTECCIÓN DE RUTA ────────────────────────────────────
+  const token = localStorage.getItem('token')
+  if (!token) {
+    window.location.href = 'index.html'
+  }
+
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}')
+  document.getElementById('nombre-usuario').textContent = usuario.nombre || 'Usuario'
+
+  function cerrarSesion() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+    window.location.href = 'index.html'
+  }
+
+  // ── DATOS MOCK (mientras el backend no esté listo) ────────
+  const recetasMock = [
+    {
+      id: 1,
+      titulo: 'Tacos de res',
+      tiempo_preparacion: 30,
+      porciones: 4,
+      imagen_url: null
+    },
+    {
+      id: 2,
+      titulo: 'Ensalada César',
+      tiempo_preparacion: 15,
+      porciones: 2,
+      imagen_url: null
+    },
+    {
+      id: 3,
+      titulo: 'Sopa de tomate',
+      tiempo_preparacion: 40,
+      porciones: 6,
+      imagen_url: null
+    }
+  ]
+
+  // ── CARGAR RECETAS ─────────────────────────────────────────
+  async function cargarRecetas() {
+    try {
+      const res = await fetch(`${API}/recetas`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Error al cargar')
+      todasLasRecetas = await res.json()
+    } catch (err) {
+      console.warn('API no disponible, usando datos de prueba:', err)
+      todasLasRecetas = recetasMock
+    }
+    renderRecetas(todasLasRecetas)
+  }
+
+  // ── RENDERIZAR TARJETAS ────────────────────────────────────
+  function renderRecetas(lista) {
+    const contenido = document.getElementById('contenido')
+
+    if (lista.length === 0) {
+      contenido.innerHTML = `
+        <div class="estado-vacio">
+          <span class="icon">📋</span>
+          <p>Todavía no tienes recetas guardadas</p>
+          <button class="btn-nueva" onclick="window.location.href='formulario.html'">+ Crear mi primera receta</button>
+        </div>`
+      return
+    }
+
+    contenido.innerHTML = `
+      <div class="recetas-grid">
+        ${lista.map(r => `
+          <div class="receta-card">
+            <div class="receta-img" onclick="verReceta(${r.id})">
+              ${r.imagen_url ? `<img src="${r.imagen_url}" style="width:100%;height:100%;object-fit:cover">` : '🍲'}
+            </div>
+            <div class="receta-info" onclick="verReceta(${r.id})">
+              <div class="receta-titulo">${escapeHtml(r.titulo)}</div>
+              <div class="receta-meta">
+                <span>⏱ ${r.tiempo_preparacion} min</span>
+                <span>🍽 ${r.porciones} porciones</span>
+              </div>
+            </div>
+            <div class="receta-actions">
+              <button onclick="editarReceta(${r.id})">✏️ Editar</button>
+              <div class="divider"></div>
+              <button class="delete" onclick="pedirBorrar(${r.id})">🗑️ Eliminar</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>`
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div')
+    div.textContent = str
+    return div.innerHTML
+  }
+
+  // ── BUSCADOR ────────────────────────────────────────────────
+  function filtrarRecetas() {
+    const texto = document.getElementById('buscador').value.toLowerCase()
+    const filtradas = todasLasRecetas.filter(r => r.titulo.toLowerCase().includes(texto))
+    renderRecetas(filtradas)
+  }
+
+  // ── NAVEGACIÓN ──────────────────────────────────────────────
+  function verReceta(id) {
+    window.location.href = `formulario.html?id=${id}`
+  }
+  function editarReceta(id) {
+    window.location.href = `formulario.html?id=${id}`
+  }
+
+  // ── BORRAR RECETA ───────────────────────────────────────────
+  function pedirBorrar(id) {
+    idABorrar = id
+    document.getElementById('modal-borrar').classList.add('active')
+  }
+  function cerrarModal() {
+    idABorrar = null
+    document.getElementById('modal-borrar').classList.remove('active')
+  }
+
+  async function confirmarBorrar() {
+    try {
+      const res = await fetch(`${API}/recetas/${idABorrar}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Error al borrar')
+    } catch (err) {
+      console.warn('API no disponible, borrando solo localmente:', err)
+    }
+    todasLasRecetas = todasLasRecetas.filter(r => r.id !== idABorrar)
+    renderRecetas(todasLasRecetas)
+    cerrarModal()
+  }
+
+  // ── INICIO ──────────────────────────────────────────────────
+  cargarRecetas()
+</script>
+
+</body>
+</html>

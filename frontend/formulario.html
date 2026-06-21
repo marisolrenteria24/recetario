@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecetApp — Receta</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f0; min-height: 100vh; }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .btn-back {
+      background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #666;
+      display: flex; align-items: center;
+    }
+    header h1 { font-size: 1.05rem; font-weight: 700; color: #1a1a1a; }
+
+    main { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      margin-bottom: 1rem;
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .field label { font-size: 0.825rem; font-weight: 500; color: #444; }
+    .field input, .field textarea {
+      border: 1.5px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 0.65rem 0.875rem;
+      font-size: 0.875rem;
+      color: #1a1a1a;
+      outline: none;
+      font-family: inherit;
+    }
+    .field input:focus, .field textarea:focus { border-color: #e07b39; }
+    .field textarea { resize: vertical; min-height: 100px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .error-msg { font-size: 0.775rem; color: #e04040; display: none; }
+    .error-msg.visible { display: block; }
+    .field input.error, .field textarea.error { border-color: #e04040; }
+
+    /* Buscador de ingredientes */
+    .ingrediente-search {
+      position: relative;
+    }
+    .ingrediente-search input {
+      width: 100%;
+    }
+    .resultados-busqueda {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+    .resultados-busqueda.active { display: block; }
+    .resultado-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .resultado-item:hover { background: #f8f8f8; }
+    .resultado-item img {
+      width: 28px; height: 28px; border-radius: 4px; object-fit: cover; background: #f0ece3;
+    }
+    .resultado-item .placeholder-icon {
+      width: 28px; height: 28px; border-radius: 4px; background: #f0ece3;
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+    }
+    .buscando-msg { padding: 0.6rem 0.8rem; font-size: 0.8rem; color: #999; }
+
+    /* Lista de ingredientes agregados */
+    .ingredientes-lista { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+    .ingrediente-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #faf8f3;
+      border: 1px solid #f0ece3;
+      border-radius: 8px;
+      padding: 0.5rem 0.7rem;
+    }
+    .ingrediente-chip img, .ingrediente-chip .placeholder-icon {
+      width: 26px; height: 26px; border-radius: 4px; object-fit: cover; background: #f0ece3;
+      display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .ingrediente-chip .nombre { flex: 1; font-size: 0.85rem; color: #1a1a1a; }
+    .ingrediente-chip input.cantidad {
+      width: 70px;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    .ingrediente-chip input.unidad {
+      width: 80px;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8rem;
+    }
+    .ingrediente-chip .quitar {
+      background: none; border: none; color: #c44; cursor: pointer; font-size: 1rem; padding: 0.2rem;
+    }
+    .sin-ingredientes { font-size: 0.8rem; color: #999; padding: 0.5rem 0; }
+
+    /* Botones finales */
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .btn-cancelar, .btn-guardar {
+      flex: 1;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-cancelar { background: #f0f0f0; color: #444; }
+    .btn-guardar { background: #e07b39; color: #fff; }
+    .btn-guardar:hover { background: #c9682a; }
+    .btn-guardar:disabled { background: #ddd; cursor: not-allowed; }
+
+    .status-msg {
+      border-radius: 8px;
+      padding: 0.7rem 0.875rem;
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+      margin-bottom: 1rem;
+    }
+    .status-msg.success { display: block; background: #edfaf3; color: #1a7a45; }
+    .status-msg.error   { display: block; background: #fdf0f0; color: #c0392b; }
+
+    .spinner {
+      display: inline-block;
+      width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="btn-back" onclick="window.location.href='recetas.html'">←</button>
+  <h1 id="titulo-pagina">Nueva receta</h1>
+</header>
+
+<main>
+  <div class="status-msg" id="status-general"></div>
+
+  <form id="form-receta" onsubmit="guardarReceta(event)">
+
+    <!-- Datos generales -->
+    <div class="card">
+      <h2>Datos de la receta</h2>
+
+      <div class="field">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" placeholder="Ej. Tacos de res" required>
+        <span class="error-msg" id="err-titulo"></span>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="tiempo">Tiempo de preparación (minutos)</label>
+          <input type="number" id="tiempo" placeholder="30" min="1" required>
+          <span class="error-msg" id="err-tiempo"></span>
+        </div>
+        <div class="field">
+          <label for="porciones">Porciones</label>
+          <input type="number" id="porciones" placeholder="4" min="1" required>
+          <span class="error-msg" id="err-porciones"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="imagen">URL de imagen (opcional)</label>
+        <input type="text" id="imagen" placeholder="https://...">
+      </div>
+
+      <div class="field">
+        <label for="instrucciones">Instrucciones</label>
+        <textarea id="instrucciones" placeholder="Describe paso a paso cómo se prepara..." required></textarea>
+        <span class="error-msg" id="err-instrucciones"></span>
+      </div>
+    </div>
+
+    <!-- Ingredientes -->
+    <div class="card">
+      <h2>Ingredientes</h2>
+
+      <div class="field ingrediente-search">
+        <label for="buscar-ingrediente">Buscar ingrediente</label>
+        <input type="text" id="buscar-ingrediente" placeholder="Ej. tomate, cebolla..." autocomplete="off" oninput="buscarIngredientes(this.value)">
+        <div class="resultados-busqueda" id="resultados"></div>
+      </div>
+
+      <div class="ingredientes-lista" id="lista-ingredientes">
+        <div class="sin-ingredientes" id="msg-sin-ingredientes">Aún no has agregado ingredientes</div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancelar" onclick="window.location.href='recetas.html'">Cancelar</button>
+      <button type="submit" class="btn-guardar" id="btn-guardar">Guardar receta</button>
+    </div>
+
+  </form>
+</main>
+
+<script>
+  // ── CONFIGURACIÓN ──────────────────────────────────────────
+  const API = 'http://localhost:8080/api'
+
+  const token = localStorage.getItem('token')
+  if (!token) window.location.href = 'index.html'
+
+  // ── ESTADO ──────────────────────────────────────────────────
+  let ingredientesAgregados = []
+  let timeoutBusqueda = null
+
+  // Si viene ?id=X en la URL, estamos editando
+  const params = new URLSearchParams(window.location.search)
+  const recetaId = params.get('id')
+
+  if (recetaId) {
+    document.getElementById('titulo-pagina').textContent = 'Editar receta'
+    cargarRecetaExistente(recetaId)
+  }
+
+  // ── DATOS MOCK DE INGREDIENTES (mientras no haya API pública conectada) ──
+  const ingredientesMock = [
+    { api_ingredient_id: 1001, nombre: 'Tomate', imagen: null },
+    { api_ingredient_id: 1002, nombre: 'Cebolla', imagen: null },
+    { api_ingredient_id: 1003, nombre: 'Carne de res', imagen: null },
+    { api_ingredient_id: 1004, nombre: 'Tortilla de maíz', imagen: null },
+    { api_ingredient_id: 1005, nombre: 'Cilantro', imagen: null },
+    { api_ingredient_id: 1006, nombre: 'Limón', imagen: null },
+    { api_ingredient_id: 1007, nombre: 'Queso fresco', imagen: null },
+    { api_ingredient_id: 1008, nombre: 'Lechuga', imagen: null }
+  ]
+
+  // ── BUSCAR INGREDIENTES (con debounce) ─────────────────────
+  function buscarIngredientes(texto) {
+    clearTimeout(timeoutBusqueda)
+    const resultadosDiv = document.getElementById('resultados')
+
+    if (texto.trim().length < 2) {
+      resultadosDiv.classList.remove('active')
+      return
+    }
+
+    resultadosDiv.innerHTML = '<div class="buscando-msg">Buscando...</div>'
+    resultadosDiv.classList.add('active')
+
+    // Esperar 400ms después de que el usuario deja de escribir, para no saturar la API
+    timeoutBusqueda = setTimeout(async () => {
+      let resultados = []
+      try {
+        const res = await fetch(`${API}/ingredientes/buscar?q=${encodeURIComponent(texto)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (!res.ok) throw new Error('Error API')
+        resultados = await res.json()
+      } catch (err) {
+        console.warn('API de ingredientes no disponible, usando mock:', err)
+        resultados = ingredientesMock.filter(i => i.nombre.toLowerCase().includes(texto.toLowerCase()))
+      }
+      renderResultados(resultados)
+    }, 400)
+  }
+
+  function renderResultados(resultados) {
+    const div = document.getElementById('resultados')
+    if (resultados.length === 0) {
+      div.innerHTML = '<div class="buscando-msg">No se encontraron ingredientes</div>'
+      return
+    }
+    div.innerHTML = resultados.map(r => `
+      <div class="resultado-item" onclick='agregarIngrediente(${JSON.stringify(r)})'>
+        ${r.imagen ? `<img src="${r.imagen}">` : '<div class="placeholder-icon">🥕</div>'}
+        <span>${escapeHtml(r.nombre)}</span>
+      </div>
+    `).join('')
+  }
+
+  // ── AGREGAR / QUITAR INGREDIENTES ──────────────────────────
+  function agregarIngrediente(ingrediente) {
+    // Evitar duplicados
+    if (ingredientesAgregados.find(i => i.api_ingredient_id === ingrediente.api_ingredient_id)) {
+      document.getElementById('resultados').classList.remove('active')
+      document.getElementById('buscar-ingrediente').value = ''
+      return
+    }
+    ingredientesAgregados.push({
+      ...ingrediente,
+      cantidad: '1',
+      unidad: 'pza'
+    })
+    document.getElementById('buscar-ingrediente').value = ''
+    document.getElementById('resultados').classList.remove('active')
+    renderIngredientesAgregados()
+  }
+
+  function quitarIngrediente(idx) {
+    ingredientesAgregados.splice(idx, 1)
+    renderIngredientesAgregados()
+  }
+
+  function actualizarCantidad(idx, valor) {
+    ingredientesAgregados[idx].cantidad = valor
+  }
+  function actualizarUnidad(idx, valor) {
+    ingredientesAgregados[idx].unidad = valor
+  }
+
+  function renderIngredientesAgregados() {
+    const div = document.getElementById('lista-ingredientes')
+
+    if (ingredientesAgregados.length === 0) {
+      div.innerHTML = '<div class="sin-ingredientes" id="msg-sin-ingredientes">Aún no has agregado ingredientes</div>'
+      return
+    }
+
+    div.innerHTML = ingredientesAgregados.map((ing, idx) => `
+      <div class="ingrediente-chip">
+        ${ing.imagen ? `<img src="${ing.imagen}">` : '<div class="placeholder-icon">🥕</div>'}
+        <span class="nombre">${escapeHtml(ing.nombre)}</span>
+        <input type="text" class="cantidad" value="${ing.cantidad}" oninput="actualizarCantidad(${idx}, this.value)" placeholder="Cant.">
+        <input type="text" class="unidad" value="${ing.unidad}" oninput="actualizarUnidad(${idx}, this.value)" placeholder="Unidad">
+        <button type="button" class="quitar" onclick="quitarIngrediente(${idx})" aria-label="Quitar ${escapeHtml(ing.nombre)}">✕</button>
+      </div>
+    `).join('')
+  }
+
+  // ── CARGAR RECETA EXISTENTE (modo edición) ─────────────────
+  async function cargarRecetaExistente(id) {
+    try {
+      const res = await fetch(`${API}/recetas/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('No encontrada')
+      const receta = await res.json()
+      rellenarFormulario(receta)
+    } catch (err) {
+      console.warn('API no disponible, usando datos de prueba:', err)
+      // Receta de prueba para modo edición sin backend
+      rellenarFormulario({
+        titulo: 'Tacos de res',
+        instrucciones: 'Dorar la carne, calentar las tortillas y armar los tacos con cilantro y cebolla.',
+        tiempo_preparacion: 30,
+        porciones: 4,
+        imagen_url: '',
+        ingredientes: [
+          { api_ingredient_id: 1003, nombre: 'Carne de res', cantidad: '500', unidad: 'gramos', imagen: null },
+          { api_ingredient_id: 1004, nombre: 'Tortilla de maíz', cantidad: '12', unidad: 'pza', imagen: null }
+        ]
+      })
+    }
+  }
+
+  function rellenarFormulario(receta) {
+    document.getElementById('titulo').value = receta.titulo || ''
+    document.getElementById('tiempo').value = receta.tiempo_preparacion || ''
+    document.getElementById('porciones').value = receta.porciones || ''
+    document.getElementById('imagen').value = receta.imagen_url || ''
+    document.getElementById('instrucciones').value = receta.instrucciones || ''
+    ingredientesAgregados = receta.ingredientes || []
+    renderIngredientesAgregados()
+  }
+
+  // ── VALIDACIÓN Y GUARDADO ──────────────────────────────────
+  function clearErrors() {
+    document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('visible'))
+    document.querySelectorAll('input, textarea').forEach(i => i.classList.remove('error'))
+  }
+  function showFieldError(fieldId, errId, msg) {
+    document.getElementById(fieldId).classList.add('error')
+    const el = document.getElementById(errId)
+    el.textContent = msg
+    el.classList.add('visible')
+  }
+  function setStatus(msg, tipo) {
+    const el = document.getElementById('status-general')
+    el.textContent = msg
+    el.className = 'status-msg ' + tipo
+  }
+
+  async function guardarReceta(e) {
+    e.preventDefault()
+    clearErrors()
+
+    const titulo = document.getElementById('titulo').value.trim()
+    const tiempo = document.getElementById('tiempo').value
+    const porciones = document.getElementById('porciones').value
+    const imagen = document.getElementById('imagen').value.trim()
+    const instrucciones = document.getElementById('instrucciones').value.trim()
+
+    let valido = true
+    if (!titulo) { showFieldError('titulo', 'err-titulo', 'Escribe un título'); valido = false }
+    if (!tiempo || tiempo <= 0) { showFieldError('tiempo', 'err-tiempo', 'Tiempo inválido'); valido = false }
+    if (!porciones || porciones <= 0) { showFieldError('porciones', 'err-porciones', 'Porciones inválidas'); valido = false }
+    if (!instrucciones) { showFieldError('instrucciones', 'err-instrucciones', 'Escribe las instrucciones'); valido = false }
+    if (!valido) return
+
+    const body = {
+      titulo,
+      instrucciones,
+      tiempo_preparacion: Number(tiempo),
+      porciones: Number(porciones),
+      imagen_url: imagen,
+      ingredientes: ingredientesAgregados
+    }
+
+    const btn = document.getElementById('btn-guardar')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span>Guardando...'
+
+    try {
+      const url = recetaId ? `${API}/recetas/${recetaId}` : `${API}/recetas`
+      const method = recetaId ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        setStatus('✓ Receta guardada correctamente', 'success')
+        setTimeout(() => window.location.href = 'recetas.html', 800)
+      } else {
+        setStatus(data.error || 'No se pudo guardar la receta', 'error')
+        btn.disabled = false
+        btn.textContent = 'Guardar receta'
+      }
+    } catch (err) {
+      console.warn('API no disponible, simulando guardado:', err)
+      setStatus('✓ Receta guardada (modo prueba)', 'success')
+      setTimeout(() => window.location.href = 'recetas.html', 800)
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div')
+    div.textContent = str
+    return div.innerHTML
+  }
+
+  // Cerrar resultados de búsqueda si se hace clic fuera
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ingrediente-search')) {
+      document.getElementById('resultados').classList.remove('active')
+    }
+  })
+</script>
+
+</body>
+</html>

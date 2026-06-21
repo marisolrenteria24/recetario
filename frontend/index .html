@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecetApp — Inicia sesión</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 420px;
+      padding: 2.5rem 2rem;
+    }
+
+    /* Logo / título */
+    .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .logo p {
+      font-size: 0.875rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+
+    /* Tabs login / registro */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 1.75rem;
+    }
+    .tab {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #999;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: #e07b39;
+      border-bottom-color: #e07b39;
+    }
+
+    /* Formulario */
+    .form { display: none; flex-direction: column; gap: 1rem; }
+    .form.active { display: flex; }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field label {
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: #444;
+    }
+    .field input {
+      border: 1.5px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 0.7rem 0.875rem;
+      font-size: 0.9rem;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: #e07b39; }
+    .field input.error { border-color: #e04040; }
+
+    .error-msg {
+      font-size: 0.775rem;
+      color: #e04040;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    /* Botón principal */
+    .btn-primary {
+      background: #e07b39;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #c9682a; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { background: #ddd; cursor: not-allowed; }
+
+    /* Mensaje de estado (éxito / error general) */
+    .status-msg {
+      border-radius: 8px;
+      padding: 0.7rem 0.875rem;
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+    }
+    .status-msg.success { display: block; background: #edfaf3; color: #1a7a45; }
+    .status-msg.error   { display: block; background: #fdf0f0; color: #c0392b; }
+
+    /* Spinner dentro del botón */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Logo -->
+  <div class="logo">
+    <span class="logo-icon">🍽️</span>
+    <h1>RecetApp</h1>
+    <p>Guarda y organiza tus recetas favoritas</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('login')">Iniciar sesión</button>
+    <button class="tab"        onclick="switchTab('registro')">Crear cuenta</button>
+  </div>
+
+  <!-- ── Formulario LOGIN ── -->
+  <form class="form active" id="form-login" onsubmit="handleLogin(event)">
+    <div class="field">
+      <label for="login-email">Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="tucorreo@email.com" required>
+      <span class="error-msg" id="err-login-email"></span>
+    </div>
+    <div class="field">
+      <label for="login-pass">Contraseña</label>
+      <input type="password" id="login-pass" placeholder="Tu contraseña" required>
+      <span class="error-msg" id="err-login-pass"></span>
+    </div>
+    <div class="status-msg" id="status-login"></div>
+    <button type="submit" class="btn-primary" id="btn-login">Entrar</button>
+  </form>
+
+  <!-- ── Formulario REGISTRO ── -->
+  <form class="form" id="form-registro" onsubmit="handleRegistro(event)">
+    <div class="field">
+      <label for="reg-nombre">Nombre completo</label>
+      <input type="text" id="reg-nombre" placeholder="Tu nombre" required>
+      <span class="error-msg" id="err-reg-nombre"></span>
+    </div>
+    <div class="field">
+      <label for="reg-email">Correo electrónico</label>
+      <input type="email" id="reg-email" placeholder="tucorreo@email.com" required>
+      <span class="error-msg" id="err-reg-email"></span>
+    </div>
+    <div class="field">
+      <label for="reg-pass">Contraseña</label>
+      <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" required minlength="6">
+      <span class="error-msg" id="err-reg-pass"></span>
+    </div>
+    <div class="field">
+      <label for="reg-pass2">Confirmar contraseña</label>
+      <input type="password" id="reg-pass2" placeholder="Repite tu contraseña" required>
+      <span class="error-msg" id="err-reg-pass2"></span>
+    </div>
+    <div class="status-msg" id="status-registro"></div>
+    <button type="submit" class="btn-primary" id="btn-registro">Crear cuenta</button>
+  </form>
+
+</div>
+
+<script>
+  // ── CONFIGURACIÓN ──────────────────────────────────────────
+  // Cuando el backend esté listo, cambia esta URL por la IP de Tailscale
+  // Ejemplo: const API = 'http://100.x.x.x:8080/api'
+  const API = 'http://localhost:8080/api'
+
+  // ── TABS ───────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'registro'))
+    })
+    document.getElementById('form-login').classList.toggle('active', tab === 'login')
+    document.getElementById('form-registro').classList.toggle('active', tab === 'registro')
+  }
+
+  // ── HELPERS ────────────────────────────────────────────────
+  function setStatus(id, msg, tipo) {
+    const el = document.getElementById(id)
+    el.textContent = msg
+    el.className = 'status-msg ' + tipo
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId)
+    if (loading) {
+      btn.disabled = true
+      btn.innerHTML = '<span class="spinner"></span>Cargando...'
+    } else {
+      btn.disabled = false
+      btn.innerHTML = btnId === 'btn-login' ? 'Entrar' : 'Crear cuenta'
+    }
+  }
+
+  function clearErrors() {
+    document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('visible'))
+    document.querySelectorAll('input').forEach(i => i.classList.remove('error'))
+  }
+
+  function showFieldError(fieldId, errId, msg) {
+    document.getElementById(fieldId).classList.add('error')
+    const el = document.getElementById(errId)
+    el.textContent = msg
+    el.classList.add('visible')
+  }
+
+  // ── LOGIN ──────────────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault()
+    clearErrors()
+
+    const email = document.getElementById('login-email').value.trim()
+    const pass  = document.getElementById('login-pass').value
+
+    // Validación básica en el frontend
+    let valido = true
+    if (!email) { showFieldError('login-email', 'err-login-email', 'Escribe tu correo'); valido = false }
+    if (!pass)  { showFieldError('login-pass',  'err-login-pass',  'Escribe tu contraseña'); valido = false }
+    if (!valido) return
+
+    setLoading('btn-login', true)
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        // Guardar el token para usarlo en las demás páginas
+        localStorage.setItem('token',   data.token)
+        localStorage.setItem('usuario', JSON.stringify(data.usuario))
+        setStatus('status-login', '✓ Entrando...', 'success')
+        setTimeout(() => window.location.href = 'recetas.html', 800)
+      } else {
+        setStatus('status-login', data.error || 'Correo o contraseña incorrectos', 'error')
+      }
+    } catch (err) {
+      // Si la API no está lista todavía, usamos datos mock para probar
+      console.warn('API no disponible, usando mock:', err)
+      usarLoginMock(email, pass)
+    } finally {
+      setLoading('btn-login', false)
+    }
+  }
+
+  // Login de prueba cuando el backend no está listo
+  function usarLoginMock(email, pass) {
+    const usuarios = [
+      { id: 1, nombre: 'Ana García',  email: 'ana@test.com',  password: '123456' },
+      { id: 2, nombre: 'Luis Pérez',  email: 'luis@test.com', password: '123456' }
+    ]
+    const user = usuarios.find(u => u.email === email && u.password === pass)
+    if (user) {
+      localStorage.setItem('token',   'mock-token-123')
+      localStorage.setItem('usuario', JSON.stringify({ id: user.id, nombre: user.nombre, email: user.email }))
+      setStatus('status-login', '✓ Entrando (modo prueba)...', 'success')
+      setTimeout(() => window.location.href = 'recetas.html', 800)
+    } else {
+      setStatus('status-login', 'Correo o contraseña incorrectos', 'error')
+    }
+  }
+
+  // ── REGISTRO ───────────────────────────────────────────────
+  async function handleRegistro(e) {
+    e.preventDefault()
+    clearErrors()
+
+    const nombre = document.getElementById('reg-nombre').value.trim()
+    const email  = document.getElementById('reg-email').value.trim()
+    const pass   = document.getElementById('reg-pass').value
+    const pass2  = document.getElementById('reg-pass2').value
+
+    // Validaciones
+    let valido = true
+    if (!nombre) { showFieldError('reg-nombre', 'err-reg-nombre', 'Escribe tu nombre'); valido = false }
+    if (!email)  { showFieldError('reg-email',  'err-reg-email',  'Escribe tu correo'); valido = false }
+    if (pass.length < 6) { showFieldError('reg-pass', 'err-reg-pass', 'Mínimo 6 caracteres'); valido = false }
+    if (pass !== pass2)  { showFieldError('reg-pass2', 'err-reg-pass2', 'Las contraseñas no coinciden'); valido = false }
+    if (!valido) return
+
+    setLoading('btn-registro', true)
+
+    try {
+      const res = await fetch(`${API}/auth/registro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, password: pass })
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        setStatus('status-registro', '✓ Cuenta creada. Ahora inicia sesión.', 'success')
+        setTimeout(() => switchTab('login'), 1500)
+      } else {
+        setStatus('status-registro', data.error || 'No se pudo crear la cuenta', 'error')
+      }
+    } catch (err) {
+      console.warn('API no disponible:', err)
+      setStatus('status-registro', '✓ Cuenta creada (modo prueba). Ahora inicia sesión.', 'success')
+      setTimeout(() => switchTab('login'), 1500)
+    } finally {
+      setLoading('btn-registro', false)
+    }
+  }
+
+  // ── Si ya hay sesión activa, ir directo a recetas ──────────
+  if (localStorage.getItem('token')) {
+    window.location.href = 'recetas.html'
+  }
+</script>
+
+</body>
+</html>
