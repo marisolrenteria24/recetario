@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetario</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Recetario web</p>
+            <h1>Busca, guarda y revisa tus recetas</h1>
+        </div>
+        <div class="session-card" id="sessionCard">
+            <span id="sessionText">Sin sesion</span>
+            <button class="ghost hidden" id="logoutButton" type="button">Salir</button>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="auth-panel" aria-label="Acceso de usuario">
+            <div class="tabs">
+                <button class="tab active" id="loginTab" type="button">Ingresar</button>
+                <button class="tab" id="registerTab" type="button">Registro</button>
+            </div>
+
+            <form class="form" id="loginForm">
+                <label>
+                    Correo
+                    <input id="loginEmail" type="email" required placeholder="correo@ejemplo.com">
+                </label>
+                <label>
+                    Contrasena
+                    <input id="loginPassword" type="password" required placeholder="Tu contrasena">
+                </label>
+                <button type="submit">Ingresar</button>
+            </form>
+
+            <form class="form hidden" id="registerForm">
+                <label>
+                    Nombre
+                    <input id="registerName" type="text" required placeholder="Tu nombre">
+                </label>
+                <label>
+                    Apellido
+                    <input id="registerLastName" type="text" required placeholder="Tu apellido">
+                </label>
+                <label>
+                    Correo
+                    <input id="registerEmail" type="email" required placeholder="correo@ejemplo.com">
+                </label>
+                <label>
+                    Contrasena
+                    <input id="registerPassword" type="password" required placeholder="Crea una contrasena">
+                </label>
+                <button type="submit">Crear cuenta</button>
+            </form>
+
+            <p class="message" id="authMessage"></p>
+        </section>
+
+        <section class="content">
+            <div class="search-band">
+                <div>
+                    <p class="eyebrow">API publica TheMealDB</p>
+                    <h2>Recetas disponibles</h2>
+                </div>
+                <form class="search" id="searchForm">
+                    <input id="searchInput" type="search" placeholder="Busca pollo, pasta, beef..." value="chicken">
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <nav class="view-tabs" aria-label="Vistas de recetas">
+                <button class="view-tab active" id="recipesViewButton" type="button">Recetas</button>
+                <button class="view-tab" id="favoritesViewButton" type="button">Favoritos</button>
+            </nav>
+
+            <p class="message" id="recipesMessage"></p>
+            <div class="recipe-grid" id="recipeGrid"></div>
+        </section>
+    </main>
+
+    <template id="recipeCardTemplate">
+        <article class="recipe-card">
+            <img class="recipe-image" alt="">
+            <div class="recipe-body">
+                <div>
+                    <h3 class="recipe-title"></h3>
+                    <p class="recipe-meta"></p>
+                </div>
+                <div class="recipe-actions">
+                    <a class="recipe-link" target="_blank" rel="noreferrer">Ver receta</a>
+                    <button class="favorite-button" type="button"></button>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
