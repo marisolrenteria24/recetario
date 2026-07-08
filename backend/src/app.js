@@ -7,6 +7,19 @@ const comentarioRoutes = require("./routes/comentarios");
 
 const app = express();
 
+// Permitir que el frontend consuma la API desde otro puerto o desde un archivo HTML.
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
+});
+
 // Middleware para recibir JSON
 app.use(express.json());
 
