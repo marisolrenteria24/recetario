@@ -5,13 +5,14 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: mi_password_secreta
-      MYSQL_DATABASE: mi_base_de_datos
+      MYSQL_DATABASE: Sistema_recetarios
       MYSQL_USER: mi_usuario
       MYSQL_PASSWORD: mi_password_usuario
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   web:
     build: .
