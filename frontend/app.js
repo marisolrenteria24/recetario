@@ -204,6 +204,8 @@ elements.registerForm.addEventListener("submit", async (event) => {
     }
 });
 
+
+
 elements.logoutButton.addEventListener("click", () => {
     state.user = null;
     localStorage.removeItem("recetarioUser");
