@@ -1,284 +1,649 @@
-:root {
-    --bg: #f7f5ef;
-    --ink: #1f2933;
-    --muted: #6b7280;
-    --line: #d8d2c5;
-    --panel: #ffffff;
-    --accent: #2f7d57;
-    --accent-dark: #236143;
-    --warn: #b45309;
-    --shadow: 0 18px 50px rgba(31, 41, 51, 0.12);
+/* =========================
+   RESET GENERAL
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins','Segoe UI',sans-serif;
 }
 
-* {
-    box-sizing: border-box;
+
+body{
+
+    min-height:100vh;
+
+    background:
+    linear-gradient(
+        135deg,
+        #fff5e6,
+        #ffe0b2
+    );
+
+    color:#333;
+
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    color: var(--ink);
-    background: var(--bg);
-    font-family: Arial, Helvetica, sans-serif;
+
+
+/* =========================
+   UTILIDADES
+========================= */
+
+.hidden{
+
+    display:none !important;
+
 }
 
-button,
-input {
-    font: inherit;
+
+
+
+button{
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.3s;
+
 }
 
-button {
-    border: 0;
-    cursor: pointer;
+
+
+/* =========================
+   LOGIN
+========================= */
+
+
+.auth-section{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+
+    linear-gradient(
+        rgba(0,0,0,.35),
+        rgba(0,0,0,.35)
+    ),
+
+    url("https://images.unsplash.com/photo-1504674900247-0877df9cc836")
+    center/cover;
+
 }
 
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 28px clamp(18px, 5vw, 64px);
-    background: #ffffff;
-    border-bottom: 1px solid var(--line);
+
+
+.auth-card{
+
+    width:400px;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:25px;
+
+
+    box-shadow:
+
+    0 20px 40px rgba(0,0,0,.25);
+
+
+    animation:entrada .6s ease;
+
 }
 
-.eyebrow {
-    margin: 0 0 6px;
-    color: var(--accent);
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0;
+
+
+.auth-card h1{
+
+    text-align:center;
+
+    font-size:35px;
+
+    color:#ff7b00;
+
+    margin-bottom:10px;
+
 }
 
-h1,
-h2,
-h3 {
-    margin: 0;
-    letter-spacing: 0;
+
+
+.subtitle{
+
+    text-align:center;
+
+    color:#777;
+
+    margin-bottom:30px;
+
 }
 
-h1 {
-    font-size: clamp(1.8rem, 4vw, 3.2rem);
-    max-width: 760px;
+
+
+
+
+/* TABS */
+
+
+.tabs{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:25px;
+
 }
 
-h2 {
-    font-size: 1.6rem;
+
+
+.tabs button{
+
+    flex:1;
+
+    padding:12px;
+
+    border-radius:15px;
+
+    background:#eee;
+
+    color:#555;
+
 }
 
-.session-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 180px;
-    justify-content: flex-end;
-    color: var(--muted);
-    font-weight: 700;
+
+
+.tabs button.active{
+
+    background:#ff7b00;
+
+    color:white;
+
 }
 
-.layout {
-    display: grid;
-    grid-template-columns: minmax(280px, 360px) 1fr;
-    gap: 24px;
-    padding: 24px clamp(18px, 5vw, 64px) 44px;
+
+
+
+
+/* FORMULARIOS */
+
+
+form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
 }
 
-.auth-panel,
-.search-band {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+
+
+input{
+
+    padding:15px;
+
+    border-radius:15px;
+
+    border:1px solid #ddd;
+
+    font-size:15px;
+
+    outline:none;
+
 }
 
-.auth-panel {
-    align-self: start;
-    padding: 18px;
+
+
+input:focus{
+
+    border-color:#ff7b00;
+
+    box-shadow:
+    0 0 8px rgba(255,123,0,.3);
+
 }
 
-.tabs,
-.view-tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+
+
+
+form button{
+
+    padding:15px;
+
+    border-radius:15px;
+
+    background:#ff7b00;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
 }
 
-.tab,
-.view-tab,
-.ghost {
-    min-height: 42px;
-    border-radius: 6px;
-    background: #ece7dc;
-    color: var(--ink);
-    font-weight: 700;
+
+
+form button:hover{
+
+    background:#e56700;
+
+    transform:translateY(-3px);
+
 }
 
-.tab.active,
-.view-tab.active,
-button[type="submit"],
-.favorite-button.active {
-    background: var(--accent);
-    color: #ffffff;
+
+
+#authMessage{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    color:#ff7b00;
+
 }
 
-.form {
-    display: grid;
-    gap: 14px;
-    margin-top: 18px;
+
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+
+.navbar{
+
+    height:75px;
+
+    background:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 50px;
+
+
+    box-shadow:
+
+    0 5px 20px rgba(0,0,0,.1);
+
 }
 
-label {
-    display: grid;
-    gap: 7px;
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 700;
+
+
+.navbar h2{
+
+    color:#ff7b00;
+
+    font-size:28px;
+
 }
 
-input {
-    width: 100%;
-    min-height: 44px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 10px 12px;
-    color: var(--ink);
-    background: #fffdf8;
+
+
+
+.session{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
 }
 
-button[type="submit"] {
-    min-height: 46px;
-    border-radius: 6px;
-    font-weight: 800;
+
+
+#logoutButton{
+
+    background:#ff4757;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:20px;
+
 }
 
-.content {
-    min-width: 0;
+
+
+#logoutButton:hover{
+
+    background:#d63031;
+
 }
 
-.search-band {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 18px;
+
+
+
+/* =========================
+   CONTENIDO
+========================= */
+
+
+.container{
+
+    padding:40px;
+
 }
 
-.search {
-    display: grid;
-    grid-template-columns: minmax(180px, 320px) 110px;
-    gap: 10px;
+
+
+
+
+.search-box form{
+
+    flex-direction:row;
+
+    background:white;
+
+    padding:15px;
+
+    border-radius:25px;
+
+    box-shadow:
+
+    0 10px 25px rgba(0,0,0,.1);
+
 }
 
-.view-tabs {
-    max-width: 360px;
-    margin: 18px 0;
+
+
+.search-box input{
+
+    flex:1;
+
+    border:none;
+
 }
 
-.message {
-    min-height: 22px;
-    margin: 14px 0 0;
-    color: var(--warn);
-    font-weight: 700;
+
+
+.search-box button{
+
+    padding:12px 30px;
+
+    background:#ff7b00;
+
+    color:white;
+
+    border-radius:20px;
+
 }
 
-.recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 18px;
+
+
+
+
+/* =========================
+   BOTONES DE VISTA
+========================= */
+
+
+.views{
+
+    margin:35px 0;
+
+    display:flex;
+
+    gap:15px;
+
 }
 
-.recipe-card {
-    overflow: hidden;
-    min-height: 360px;
-    display: grid;
-    grid-template-rows: 180px 1fr;
-    background: #ffffff;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    box-shadow: 0 12px 32px rgba(31, 41, 51, 0.1);
+
+
+.views button{
+
+    padding:12px 25px;
+
+    border-radius:20px;
+
+    background:white;
+
 }
 
-.recipe-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    background: #e9e2d3;
+
+
+.views button.active{
+
+    background:#ff7b00;
+
+    color:white;
+
 }
 
-.recipe-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px;
+
+
+
+
+/* =========================
+   RECETAS
+========================= */
+
+
+.recipe-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:30px;
+
 }
 
-.recipe-title {
-    font-size: 1.05rem;
-    line-height: 1.3;
+
+
+
+.recipe-card{
+
+    background:white;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    box-shadow:
+
+    0 15px 30px rgba(0,0,0,.12);
+
+    transition:.35s;
+
 }
 
-.recipe-meta {
-    margin: 8px 0 0;
-    color: var(--muted);
-    font-size: 0.9rem;
+
+
+.recipe-card:hover{
+
+    transform:
+
+    translateY(-10px);
+
 }
 
-.recipe-actions {
-    display: grid;
-    grid-template-columns: 1fr 44px;
-    gap: 10px;
-    align-items: center;
+
+
+
+
+.recipe-image{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
 }
 
-.recipe-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 42px;
-    border-radius: 6px;
-    color: var(--accent-dark);
-    background: #eaf4ee;
-    font-weight: 800;
-    text-decoration: none;
+
+
+
+
+.recipe-info{
+
+    padding:20px;
+
 }
 
-.favorite-button {
-    width: 44px;
-    height: 42px;
-    border-radius: 6px;
-    background: #ece7dc;
-    color: var(--ink);
-    font-size: 1.15rem;
+
+
+.recipe-title{
+
+    font-size:22px;
+
+    margin-bottom:10px;
+
 }
 
-.hidden {
-    display: none;
+
+
+.recipe-meta{
+
+    color:#777;
+
+    margin-bottom:20px;
+
 }
 
-@media (max-width: 850px) {
-    .topbar,
-    .search-band {
-        align-items: stretch;
-        flex-direction: column;
+
+
+
+.actions{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+
+
+
+.recipe-link{
+
+    text-decoration:none;
+
+    background:#ff7b00;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:20px;
+
+}
+
+
+
+.favorite-button{
+
+    font-size:28px;
+
+    background:none;
+
+    color:#ff7b00;
+
+}
+
+
+
+.favorite-button.active{
+
+    color:red;
+
+}
+
+
+
+
+
+
+/* =========================
+   ANIMACION
+========================= */
+
+
+@keyframes entrada{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
     }
 
-    .layout {
-        grid-template-columns: 1fr;
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
     }
 
-    .session-card {
-        justify-content: flex-start;
-    }
 }
 
-@media (max-width: 520px) {
-    .search {
-        grid-template-columns: 1fr;
-    }
 
-    .recipe-grid {
-        grid-template-columns: 1fr;
-    }
+
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+
+@media(max-width:700px){
+
+
+.navbar{
+
+    padding:0 20px;
+
+}
+
+
+
+.container{
+
+    padding:20px;
+
+}
+
+
+
+.auth-card{
+
+    width:90%;
+
+}
+
+
+
+.search-box form{
+
+    flex-direction:column;
+
+}
+
+
 }
