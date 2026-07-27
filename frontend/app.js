@@ -28,6 +28,17 @@ function saveUser(user) {
     state.user = user;
     localStorage.setItem("recetarioUser", JSON.stringify(user));
     renderSession();
+    showApp();
+}
+
+function showApp() {
+    document.getElementById("authSection").classList.add("hidden");
+    document.getElementById("appSection").classList.remove("hidden");
+}
+
+function showAuth() {
+    document.getElementById("appSection").classList.add("hidden");
+    document.getElementById("authSection").classList.remove("hidden");
 }
 
 function saveFavorites() {
@@ -210,7 +221,7 @@ elements.logoutButton.addEventListener("click", () => {
     state.user = null;
     localStorage.removeItem("recetarioUser");
     renderSession();
-    renderRecipes();
+    showAuth();
 });
 
 elements.searchForm.addEventListener("submit", (event) => {
@@ -226,4 +237,11 @@ elements.recipesViewButton.addEventListener("click", () => setView("recipes"));
 elements.favoritesViewButton.addEventListener("click", () => setView("favorites"));
 
 renderSession();
+
+if (state.user) {
+    showApp();
+} else {
+    showAuth();
+}
+
 searchRecipes(elements.searchInput.value);
